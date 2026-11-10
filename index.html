@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Celeiro Financeiro — brinde Radar Global</title>
+  <!--
+    ONDE TROCAR AS 3 COISAS
+
+    (1) Logo Trigo Sonar
+        Procure a tag <img class="logo"> e troque o atributo src.
+        Hoje: src="trigo-sonar-logo.png"
+        O arquivo precisa ficar na mesma pasta desta página, ou use um endereço completo.
+
+    (2) Link real da planilha
+        Procure a constante ARQUIVO_PLANILHA, no <script> no final da página.
+        Hoje aponta para o arquivo publicado junto com esta página:
+        "Celeiro-Financeiro.xlsm"
+        Troque por uma URL quando for hospedar, por exemplo:
+        "https://drive.google.com/uc?export=download&id=SEU_ID"
+        "https://seusite.com/celeiro-financeiro.xlsx"
+
+    (3) Link individual de cada assinante
+        Depois de hospedar, acrescente ?aluno= no final do endereço.
+        Exemplo: https://celeiro-financeiro-radar-global.vercel.app/?Semeador
+        Também aceita ?id=CODIGO123
+  -->
+  <style>
+    :root {
+      --bege: #F7F5F0;
+      --branco: #FFFFFF;
+      --azul-escuro: #1E293B;
+      --azul-medio: #4B6584;
+      --nude: #E2C29D;
+      --terracota: #A57C5A;
+      --cinza: #737373;
+      --sombra: 0 4px 14px rgba(30, 41, 59, 0.08);
+      --fonte: "Segoe UI", Inter, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bege);
+      color: var(--azul-escuro);
+      font-family: var(--fonte);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .pagina {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    .topo {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      min-width: 0;
+    }
+
+    .idiomas {
+      display: flex;
+      flex: 0 1 auto;
+      gap: 8px;
+      margin-top: 8px;
+      min-width: 0;
+    }
+
+    .idiomas button {
+      border: 0;
+      background: var(--branco);
+      color: var(--azul-medio);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      cursor: pointer;
+      box-shadow: var(--sombra);
+    }
+
+    .idiomas button.ativo {
+      background: var(--azul-escuro);
+      color: var(--branco);
+    }
+
+    .idiomas button:focus-visible {
+      outline: 3px solid var(--nude);
+      outline-offset: 3px;
+    }
+
+    /* Marca */
+    .marca {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .marca > div {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .logo {
+      width: auto;
+      height: 84px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .nome {
+      margin: 0;
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+    }
+
+    .nome .celeiro {
+      color: var(--azul-escuro);
+    }
+
+    .nome .financeiro {
+      color: var(--terracota);
+      margin-left: 0.28em;
+    }
+
+    .subtitulo-marca {
+      margin: 6px 0 0;
+      color: var(--cinza);
+      font-size: 14px;
+      overflow-wrap: break-word;
+    }
+
+    .versiculo {
+      margin: 12px 0 0;
+      max-width: 68ch;
+    }
+
+    .versiculo-rotulo {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--terracota);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .versiculo-texto {
+      display: block;
+      color: var(--azul-medio);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .versiculo-ref {
+      display: block;
+      margin-top: 4px;
+      color: var(--azul-escuro);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* Hero */
+    .hero {
+      margin-top: 36px;
+    }
+
+    .boas-vindas {
+      display: none;
+      margin: 0 0 14px;
+      color: var(--azul-medio);
+      font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+      font-weight: 600;
+    }
+
+    .boas-vindas.visivel {
+      display: block;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 22ch;
+      font-size: clamp(1.9rem, 5vw, 2.75rem);
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 700;
+      color: var(--azul-escuro);
+    }
+
+    .apoio {
+      max-width: 62ch;
+      margin: 16px 0 0;
+      color: var(--azul-medio);
+      font-size: clamp(1rem, 2.2vw, 1.125rem);
+    }
+
+    .acoes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .botao {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 14px 22px;
+      border-radius: 12px;
+      background: var(--azul-escuro);
+      color: var(--branco);
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      box-shadow: 0 8px 18px rgba(30, 41, 59, 0.16);
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .botao:hover,
+    .botao:focus-visible {
+      transform: scale(1.02);
+      background: var(--azul-escuro);
+    }
+
+    .botao:focus-visible {
+      outline: 3px solid var(--nude);
+      outline-offset: 3px;
+    }
+
+    /* Cards */
+    .secao {
+      margin-top: 56px;
+    }
+
+    .secao h2 {
+      margin: 0 0 18px;
+      font-size: clamp(1.4rem, 3vw, 1.75rem);
+      letter-spacing: -0.03em;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--branco);
+      border-radius: 16px;
+      box-shadow: var(--sombra);
+      padding: 22px 20px 24px;
+    }
+
+    .icone {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 14px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--cinza);
+      font-size: 0.95rem;
+    }
+
+    /* Download */
+    .download {
+      margin-top: 28px;
+      background: var(--branco);
+      border-radius: 16px;
+      box-shadow: var(--sombra);
+      padding: clamp(24px, 4vw, 40px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .download h2 {
+      margin: 0 0 8px;
+    }
+
+    .download p {
+      margin: 0;
+      color: var(--cinza);
+      max-width: 46ch;
+    }
+
+    .faixa {
+      height: 4px;
+      width: 72px;
+      margin-bottom: 16px;
+      border-radius: 999px;
+      background: var(--nude);
+    }
+
+    footer {
+      margin-top: 40px;
+      color: var(--cinza);
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .cards {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        overflow-x: hidden;
+      }
+
+      .pagina {
+        width: 100%;
+        max-width: 100%;
+        padding: 20px 16px 40px;
+        overflow: hidden;
+      }
+
+      .topo {
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .topo > * {
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .nome {
+        font-size: 22px;
+      }
+
+      .idiomas {
+        display: flex;
+        width: calc(100vw - 48px);
+        max-width: calc(100vw - 48px);
+        margin-top: 4px;
+      }
+
+      .idiomas button {
+        flex: 1 1 0;
+        min-width: 0;
+        overflow: hidden;
+        padding: 10px 4px;
+        font-size: 12px;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .marca {
+        align-items: center;
+        gap: 12px;
+        width: calc(100vw - 48px);
+        max-width: calc(100vw - 48px);
+      }
+
+      .logo {
+        height: 64px;
+      }
+
+      .cards,
+      .download {
+        grid-template-columns: 1fr;
+      }
+
+      .download {
+        display: block;
+      }
+
+      .download .botao {
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      .acoes .botao {
+        width: 100%;
+      }
+
+      h1 {
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="pagina">
+    <div class="topo">
+      <!-- 1. Marca: logo + Celeiro Financeiro -->
+      <header class="marca">
+        <!-- (1) Troque o src se o arquivo da logo tiver outro nome ou outra pasta. -->
+        <img class="logo" src="trigo-sonar-logo.png" alt="Trigo Sonar">
+        <div>
+          <p class="nome">
+            <span class="celeiro">Celeiro</span><span class="financeiro">Financeiro</span>
+          </p>
+          <p class="subtitulo-marca" data-i18n="subtitulo">Um brinde exclusivo para assinantes do Radar Global</p>
+          <p class="versiculo" id="versiculo">
+            <span class="versiculo-rotulo" data-i18n="versiculoRotulo">Versículo do dia</span>
+            <span class="versiculo-texto" id="versiculo-texto"></span>
+            <span class="versiculo-ref" id="versiculo-ref"></span>
+          </p>
+        </div>
+      </header>
+      <nav class="idiomas" aria-label="Idioma">
+        <button type="button" data-idioma="pt" lang="pt-BR">Português</button>
+        <button type="button" data-idioma="en" lang="en">English</button>
+        <button type="button" data-idioma="es" lang="es">Español</button>
+      </nav>
+    </div>
+
+    <!-- 2. Hero -->
+    <section class="hero">
+      <p id="boas-vindas" class="boas-vindas"></p>
+      <!--
+        Título com emoji, se quiser um tom mais leve:
+        <h1>Seu Celeiro Financeiro está pronto 🌾</h1>
+      -->
+      <h1 data-i18n="titulo">Seu Celeiro Financeiro está pronto</h1>
+      <p class="apoio" data-i18n="apoio">
+        Uma planilha para acompanhar o investimento em tráfego pago e o faturamento,
+        cruzando Brasil, Internacional e LATAM. Google Ads, Meta, TikTok e YouTube
+        entram na mesma visão, com BRL, USD e EUR convertidos para euro.
+      </p>
+      <div class="acoes">
+        <a class="botao download-planilha" href="Celeiro-Financeiro.xlsm" data-i18n="baixar">Baixar minha Planilha</a>
+      </div>
+    </section>
+
+    <!-- 3. O que a pessoa recebe -->
+    <section class="secao" aria-labelledby="titulo-recebe">
+      <h2 id="titulo-recebe" data-i18n="recebe">O que você recebe</h2>
+      <div class="cards">
+        <article class="card">
+          <svg class="icone" viewBox="0 0 36 36" aria-hidden="true">
+            <circle cx="18" cy="18" r="14" fill="none" stroke="#1E293B" stroke-width="1.6"/>
+            <path d="M18 6v12l8 4" fill="none" stroke="#A57C5A" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <h3 data-i18n="card1t">Controle multirregional</h3>
+          <p data-i18n="card1p">Brasil, Internacional e LATAM ficam separados, para comparar cada mercado.</p>
+        </article>
+        <article class="card">
+          <svg class="icone" viewBox="0 0 36 36" aria-hidden="true">
+            <rect x="6" y="10" width="24" height="16" rx="4" fill="none" stroke="#1E293B" stroke-width="1.6"/>
+            <path d="M12 18h12" stroke="#A57C5A" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <h3 data-i18n="card2t">Multimoeda</h3>
+          <p data-i18n="card2p">BRL, USD e EUR entram na moeda de origem e também consolidados em euro.</p>
+        </article>
+        <article class="card">
+          <svg class="icone" viewBox="0 0 36 36" aria-hidden="true">
+            <path d="M8 26V16M16 26V10M24 26V20M30 26V13" fill="none" stroke="#1E293B" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <h3 data-i18n="card3t">Dashboard visual</h3>
+          <p data-i18n="card3p">KPIs, gráficos e tabelas prontos para ler o resultado sem montar fórmula.</p>
+        </article>
+        <article class="card">
+          <svg class="icone" viewBox="0 0 36 36" aria-hidden="true">
+            <path d="M10 18h16M18 10v16" fill="none" stroke="#A57C5A" stroke-width="1.6" stroke-linecap="round"/>
+            <rect x="7" y="7" width="22" height="22" rx="6" fill="none" stroke="#1E293B" stroke-width="1.6"/>
+          </svg>
+          <h3 data-i18n="card4t">Atualização fácil</h3>
+          <p data-i18n="card4p">Basta digitar os lançamentos. As fórmulas recalculam os totais.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. Download -->
+    <section class="secao" aria-labelledby="titulo-download">
+      <div class="download">
+        <div>
+          <div class="faixa" aria-hidden="true"></div>
+          <h2 id="titulo-download" data-i18n="baixe">Baixe o arquivo</h2>
+          <p data-i18n="baixeTexto">Clique no botão abaixo para baixar o arquivo da planilha.</p>
+        </div>
+        <a class="botao download-planilha" href="Celeiro-Financeiro.xlsm" data-i18n="baixar">Baixar minha Planilha</a>
+      </div>
+    </section>
+
+    <footer data-i18n="rodape">
+      Celeiro Financeiro é um brinde exclusivo para assinantes do Radar Global. Todos os direitos reservados.
+    </footer>
+  </main>
+
+  <script>
+    // (2) Troque somente esta linha quando tiver o link definitivo da planilha.
+    var ARQUIVO_PLANILHA = "Celeiro-Financeiro.xlsm";
+
+    function lerParametro(nome) {
+      var busca = new URLSearchParams(window.location.search);
+      var valor = busca.get(nome);
+      if (!valor) {
+        return "";
+      }
+      return valor.replace(/\+/g, " ").replace(/\s+/g, " ").trim();
+    }
+
+    function textoSeguro(valor) {
+      return valor.replace(/[<>]/g, "").slice(0, 80);
+    }
+
+    var TEXTOS = {
+      pt: {
+        html: "pt-BR",
+        tituloPagina: "Celeiro Financeiro — brinde Radar Global",
+        subtitulo: "Um brinde exclusivo para assinantes do Radar Global",
+        titulo: "Seu Celeiro Financeiro está pronto",
+        apoio: "Uma planilha para acompanhar o investimento em tráfego pago e o faturamento, cruzando Brasil, Internacional e LATAM. Google Ads, Meta, TikTok e YouTube entram na mesma visão, com BRL, USD e EUR convertidos para euro.",
+        baixar: "Baixar minha Planilha",
+        recebe: "O que você recebe",
+        card1t: "Controle multirregional",
+        card1p: "Brasil, Internacional e LATAM ficam separados, para comparar cada mercado.",
+        card2t: "Multimoeda",
+        card2p: "BRL, USD e EUR entram na moeda de origem e também consolidados em euro.",
+        card3t: "Dashboard visual",
+        card3p: "KPIs, gráficos e tabelas prontos para ler o resultado sem montar fórmula.",
+        card4t: "Atualização fácil",
+        card4p: "Basta digitar os lançamentos. As fórmulas recalculam os totais.",
+        baixe: "Baixe o arquivo",
+        baixeTexto: "Clique no botão abaixo para baixar o arquivo da planilha.",
+        rodape: "Celeiro Financeiro é um brinde exclusivo para assinantes do Radar Global. Todos os direitos reservados.",
+        versiculoRotulo: "Versículo do dia",
+        boasVindas: "Bem-vindo(a), {nome}! Seu Celeiro Financeiro está pronto para download."
+      },
+      en: {
+        html: "en",
+        tituloPagina: "Celeiro Financeiro — Radar Global gift",
+        subtitulo: "An exclusive gift for Radar Global subscribers",
+        titulo: "Your Celeiro Financeiro is ready",
+        apoio: "A spreadsheet to track paid traffic investment and revenue across Brazil, International, and LATAM. Google Ads, Meta, TikTok, and YouTube sit in the same view, with BRL, USD, and EUR converted to euros.",
+        baixar: "Download my spreadsheet",
+        recebe: "What you receive",
+        card1t: "Multiregional control",
+        card1p: "Brazil, International, and LATAM stay separate, so you can compare each market.",
+        card2t: "Multicurrency",
+        card2p: "BRL, USD, and EUR come in their original currency and also consolidated in euros.",
+        card3t: "Visual dashboard",
+        card3p: "KPIs, charts, and tables ready to read the result without building formulas.",
+        card4t: "Easy updates",
+        card4p: "Just type the entries. The formulas recalculate the totals.",
+        baixe: "Download the file",
+        baixeTexto: "Click the button below to download the spreadsheet file.",
+        rodape: "Celeiro Financeiro is an exclusive gift for Radar Global subscribers. All rights reserved.",
+        versiculoRotulo: "Verse of the day",
+        boasVindas: "Welcome, {nome}! Your Celeiro Financeiro is ready to download."
+      },
+      es: {
+        html: "es",
+        tituloPagina: "Celeiro Financeiro — regalo Radar Global",
+        subtitulo: "Un regalo exclusivo para suscriptores de Radar Global",
+        titulo: "Tu Celeiro Financeiro está listo",
+        apoio: "Una hoja de cálculo para seguir la inversión en tráfico pago y la facturación, cruzando Brasil, Internacional y LATAM. Google Ads, Meta, TikTok y YouTube entran en la misma vista, con BRL, USD y EUR convertidos a euros.",
+        baixar: "Descargar mi planilla",
+        recebe: "Lo que recibes",
+        card1t: "Control multirregional",
+        card1p: "Brasil, Internacional y LATAM quedan separados, para comparar cada mercado.",
+        card2t: "Multimoneda",
+        card2p: "BRL, USD y EUR entran en la moneda de origen y también consolidados en euros.",
+        card3t: "Dashboard visual",
+        card3p: "KPIs, gráficos y tablas listos para leer el resultado sin armar fórmulas.",
+        card4t: "Actualización fácil",
+        card4p: "Basta escribir los movimientos. Las fórmulas recalculan los totales.",
+        baixe: "Descarga el archivo",
+        baixeTexto: "Haz clic en el botón de abajo para descargar el archivo de la planilla.",
+        rodape: "Celeiro Financeiro es un regalo exclusivo para suscriptores de Radar Global. Todos los derechos reservados.",
+        versiculoRotulo: "Versículo del día",
+        boasVindas: "¡Bienvenido(a), {nome}! Tu Celeiro Financeiro está listo para descargar."
+      }
+    };
+
+    function nomeDaPagina() {
+      var nome = textoSeguro(lerParametro("aluno") || lerParametro("id"));
+      if (nome) {
+        return nome;
+      }
+      var busca = new URLSearchParams(window.location.search);
+      var chaveNome = "";
+      busca.forEach(function (valor, chave) {
+        if (!chaveNome && !valor && chave !== "idioma" && chave !== "lang" && chave !== "aluno" && chave !== "id") {
+          chaveNome = chave;
+        }
+      });
+      if (chaveNome) {
+        return textoSeguro(decodeURIComponent(chaveNome).replace(/\+/g, " ").replace(/\s+/g, " ").trim());
+      }
+      return "Semeador";
+    }
+
+    var VERSICULOS = [
+      {
+        ref: { pt: "1 Tessalonicenses 5:18", en: "1 Thessalonians 5:18", es: "1 Tesalonicenses 5:18" },
+        pt: "Em tudo dai graças, porque esta é a vontade de Deus em Cristo Jesus para convosco.",
+        en: "In every thing give thanks: for this is the will of God in Christ Jesus concerning you.",
+        es: "Dad gracias en todo, porque esta es la voluntad de Dios para con vosotros en Cristo Jesús."
+      },
+      {
+        ref: { pt: "Deuteronômio 28:8", en: "Deuteronomy 28:8", es: "Deuteronomio 28:8" },
+        pt: "O Senhor mandará que a bênção esteja contigo nos teus celeiros, e em tudo o que puseres a tua mão.",
+        en: "The Lord shall command the blessing upon thee in thy storehouses, and in all that thou settest thine hand unto.",
+        es: "El Señor enviará su bendición sobre tus graneros, y sobre todo aquello en que pusieres tu mano."
+      },
+      {
+        ref: { pt: "Salmos 100:4", en: "Psalm 100:4", es: "Salmo 100:4" },
+        pt: "Entrai pelas portas dele com gratidão, e em seus átrios com louvor; louvai-o e bendizei o seu nome.",
+        en: "Enter into his gates with thanksgiving, and into his courts with praise: be thankful unto him, and bless his name.",
+        es: "Entrad por sus puertas con acción de gracias, por sus atrios con alabanza; alabadle, bendecid su nombre."
+      },
+      {
+        ref: { pt: "Filipenses 4:19", en: "Philippians 4:19", es: "Filipenses 4:19" },
+        pt: "O meu Deus, segundo as suas riquezas, suprirá todas as vossas necessidades em glória, por Cristo Jesus.",
+        en: "My God shall supply all your need according to his riches in glory by Christ Jesus.",
+        es: "Mi Dios, pues, suplirá todo lo que os falta conforme a sus riquezas en gloria en Cristo Jesús."
+      },
+      {
+        ref: { pt: "Salmos 107:1", en: "Psalm 107:1", es: "Salmo 107:1" },
+        pt: "Louvai ao Senhor, porque ele é bom, porque a sua benignidade dura para sempre.",
+        en: "O give thanks unto the Lord, for he is good: for his mercy endureth for ever.",
+        es: "Alabad al Señor, porque es bueno; porque para siempre es su misericordia."
+      },
+      {
+        ref: { pt: "Provérbios 10:22", en: "Proverbs 10:22", es: "Proverbios 10:22" },
+        pt: "A bênção do Senhor é que enriquece, e não acrescenta dores.",
+        en: "The blessing of the Lord, it maketh rich, and he addeth no sorrow with it.",
+        es: "La bendición del Señor es la que enriquece, y no añade tristeza con ella."
+      },
+      {
+        ref: { pt: "Efésios 5:20", en: "Ephesians 5:20", es: "Efesios 5:20" },
+        pt: "Dando sempre graças por tudo a nosso Deus e Pai, em nome de nosso Senhor Jesus Cristo.",
+        en: "Giving thanks always for all things unto God and the Father in the name of our Lord Jesus Christ.",
+        es: "Dando gracias siempre por todo a Dios y Padre, en el nombre de nuestro Señor Jesucristo."
+      },
+      {
+        ref: { pt: "Deuteronômio 8:18", en: "Deuteronomy 8:18", es: "Deuteronomio 8:18" },
+        pt: "Antes te lembrarás do Senhor teu Deus, que ele é o que te dá força para adquirires riquezas.",
+        en: "But thou shalt remember the Lord thy God: for it is he that giveth thee power to get wealth.",
+        es: "Acuérdate del Señor tu Dios, porque él te da el poder para hacer las riquezas."
+      },
+      {
+        ref: { pt: "Salmos 103:2", en: "Psalm 103:2", es: "Salmo 103:2" },
+        pt: "Bendize, ó minha alma, ao Senhor, e não te esqueças de nenhum de seus benefícios.",
+        en: "Bless the Lord, O my soul, and forget not all his benefits.",
+        es: "Bendice, alma mía, al Señor, y no olvides ninguno de sus beneficios."
+      },
+      {
+        ref: { pt: "Josué 1:8", en: "Joshua 1:8", es: "Josué 1:8" },
+        pt: "Medita nele dia e noite, para que tenhas cuidado de fazer conforme tudo quanto nele está escrito; porque então farás prosperar o teu caminho, e serás bem-sucedido.",
+        en: "Thou shalt meditate therein day and night, that thou mayest observe to do according to all that is written therein: for then thou shalt make thy way prosperous, and then thou shalt have good success.",
+        es: "Meditarás en él de día y de noche, para que guardes y hagas conforme a todo lo que en él está escrito; porque entonces harás prosperar tu camino, y todo te saldrá bien."
+      },
+      {
+        ref: { pt: "Filipenses 4:6", en: "Philippians 4:6", es: "Filipenses 4:6" },
+        pt: "Não estejais inquietos por coisa alguma; antes, as vossas petições sejam em tudo conhecidas diante de Deus pela oração e súplica, com ação de graças.",
+        en: "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.",
+        es: "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias."
+      },
+      {
+        ref: { pt: "Malaquias 3:10", en: "Malachi 3:10", es: "Malaquías 3:10" },
+        pt: "Trazei todos os dízimos à casa do tesouro, e provai-me nisto, diz o Senhor, se eu não vos abrir as janelas do céu e não derramar sobre vós bênção sem medida.",
+        en: "Bring ye all the tithes into the storehouse, and prove me now herewith, saith the Lord of hosts, if I will not open you the windows of heaven, and pour you out a blessing, that there shall not be room enough to receive it.",
+        es: "Traed todos los diezmos al alfolí y probadme ahora en esto, dice el Señor, si no os abriré las ventanas de los cielos y derramaré sobre vosotros bendición hasta que sobreabunde."
+      },
+      {
+        ref: { pt: "Salmos 118:24", en: "Psalm 118:24", es: "Salmo 118:24" },
+        pt: "Este é o dia que fez o Senhor; regozijemo-nos e alegremo-nos nele.",
+        en: "This is the day which the Lord hath made; we will rejoice and be glad in it.",
+        es: "Este es el día que hizo el Señor; nos gozaremos y alegraremos en él."
+      },
+      {
+        ref: { pt: "Salmos 1:3", en: "Psalm 1:3", es: "Salmo 1:3" },
+        pt: "Será como a árvore plantada junto a ribeiros de águas, que dá o seu fruto no seu tempo; e tudo quanto fizer prosperará.",
+        en: "He shall be like a tree planted by the rivers of water, that bringeth forth his fruit in his season; and whatsoever he doeth shall prosper.",
+        es: "Será como árbol plantado junto a corrientes de aguas, que da su fruto en su tiempo, y todo lo que hace prosperará."
+      },
+      {
+        ref: { pt: "Colossenses 3:17", en: "Colossians 3:17", es: "Colosenses 3:17" },
+        pt: "E tudo o que fizerdes, por palavras ou por obras, fazei em nome do Senhor Jesus, dando por ele graças a Deus Pai.",
+        en: "Whatsoever ye do in word or deed, do all in the name of the Lord Jesus, giving thanks to God and the Father by him.",
+        es: "Y todo lo que hacéis, sea de palabra o de hecho, hacedlo todo en el nombre del Señor Jesús, dando gracias a Dios Padre por medio de él."
+      },
+      {
+        ref: { pt: "Provérbios 3:9-10", en: "Proverbs 3:9-10", es: "Proverbios 3:9-10" },
+        pt: "Honra ao Senhor com os teus bens e com as primícias de toda a tua renda; e se encherão os teus celeiros abundantemente.",
+        en: "Honour the Lord with thy substance, and with the firstfruits of all thine increase: so shall thy barns be filled with plenty.",
+        es: "Honra al Señor con tus bienes y con las primicias de todos tus frutos; y serán llenos tus graneros con abundancia."
+      },
+      {
+        ref: { pt: "Salmos 23:1", en: "Psalm 23:1", es: "Salmo 23:1" },
+        pt: "O Senhor é o meu pastor; nada me faltará.",
+        en: "The Lord is my shepherd; I shall not want.",
+        es: "El Señor es mi pastor; nada me faltará."
+      },
+      {
+        ref: { pt: "3 João 1:2", en: "3 John 1:2", es: "3 Juan 1:2" },
+        pt: "Amado, desejo que te vá bem em todas as coisas e que tenhas saúde, assim como bem vai a tua alma.",
+        en: "Beloved, I wish above all things that thou mayest prosper and be in health, even as thy soul prospereth.",
+        es: "Amado, deseo que seas prosperado en todas las cosas y que tengas salud, así como prospera tu alma."
+      },
+      {
+        ref: { pt: "Salmos 136:1", en: "Psalm 136:1", es: "Salmo 136:1" },
+        pt: "Louvai ao Senhor, porque ele é bom; porque a sua misericórdia dura para sempre.",
+        en: "O give thanks unto the Lord; for he is good: for his mercy endureth for ever.",
+        es: "Alabad al Señor, porque es bueno; porque para siempre es su misericordia."
+      },
+      {
+        ref: { pt: "Jeremias 29:11", en: "Jeremiah 29:11", es: "Jeremías 29:11" },
+        pt: "Porque eu bem sei os pensamentos que tenho a vosso respeito, diz o Senhor; pensamentos de paz, e não de mal, para vos dar o fim que esperais.",
+        en: "For I know the thoughts that I think toward you, saith the Lord, thoughts of peace, and not of evil, to give you an expected end.",
+        es: "Porque yo sé los pensamientos que tengo acerca de vosotros, dice el Señor: pensamientos de paz y no de mal, para daros el fin que esperáis."
+      },
+      {
+        ref: { pt: "Salmos 37:4", en: "Psalm 37:4", es: "Salmo 37:4" },
+        pt: "Deleita-te também no Senhor, e ele te concederá os desejos do teu coração.",
+        en: "Delight thyself also in the Lord; and he shall give thee the desires of thine heart.",
+        es: "Deléitate asimismo en el Señor, y él te concederá las peticiones de tu corazón."
+      },
+      {
+        ref: { pt: "2 Coríntios 9:8", en: "2 Corinthians 9:8", es: "2 Corintios 9:8" },
+        pt: "Deus é poderoso para fazer abundar em vós toda a graça, a fim de que, tendo sempre, em tudo, toda a suficiência, superabundeis em toda boa obra.",
+        en: "God is able to make all grace abound toward you; that ye, always having all sufficiency in all things, may abound to every good work.",
+        es: "Poderoso es Dios para hacer que abunde en vosotros toda gracia, a fin de que, teniendo siempre en todas las cosas todo lo suficiente, abundéis para toda buena obra."
+      },
+      {
+        ref: { pt: "Salmos 34:10", en: "Psalm 34:10", es: "Salmo 34:10" },
+        pt: "Os leõezinhos necessitam e sofrem fome, mas aos que buscam o Senhor bem nenhum faltará.",
+        en: "The young lions do lack, and suffer hunger: but they that seek the Lord shall not want any good thing.",
+        es: "Los leoncillos necesitan y tienen hambre, pero los que buscan al Señor no tendrán falta de ningún bien."
+      },
+      {
+        ref: { pt: "Mateus 6:33", en: "Matthew 6:33", es: "Mateo 6:33" },
+        pt: "Buscai primeiro o reino de Deus e a sua justiça, e todas estas coisas vos serão acrescentadas.",
+        en: "Seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.",
+        es: "Buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas."
+      },
+      {
+        ref: { pt: "Salmos 84:11", en: "Psalm 84:11", es: "Salmo 84:11" },
+        pt: "Porque o Senhor Deus é sol e escudo; o Senhor dará graça e glória; não negará bem algum aos que andam na retidão.",
+        en: "For the Lord God is a sun and shield: the Lord will give grace and glory: no good thing will he withhold from them that walk uprightly.",
+        es: "Porque sol y escudo es el Señor Dios; gracia y gloria dará el Señor. No quitará el bien a los que andan en integridad."
+      },
+      {
+        ref: { pt: "Lucas 6:38", en: "Luke 6:38", es: "Lucas 6:38" },
+        pt: "Dai, e ser-vos-á dado; boa medida, recalcada, sacudida e transbordando vos deitarão no regaço.",
+        en: "Give, and it shall be given unto you; good measure, pressed down, and shaken together, and running over, shall men give into your bosom.",
+        es: "Dad, y se os dará; medida buena, apretada, remecida y rebosando darán en vuestro regazo."
+      },
+      {
+        ref: { pt: "Gênesis 12:2", en: "Genesis 12:2", es: "Génesis 12:2" },
+        pt: "De ti farei uma grande nação, e te abençoarei, e engrandecerei o teu nome; e tu serás uma bênção.",
+        en: "I will make of thee a great nation, and I will bless thee, and make thy name great; and thou shalt be a blessing.",
+        es: "Haré de ti una nación grande, te bendeciré, engrandeceré tu nombre y serás bendición."
+      },
+      {
+        ref: { pt: "Provérbios 11:25", en: "Proverbs 11:25", es: "Proverbios 11:25" },
+        pt: "A alma generosa prosperará, e quem regar também será regado.",
+        en: "The liberal soul shall be made fat: and he that watereth shall be watered also himself.",
+        es: "El alma generosa será prosperada, y el que saciare también será saciado."
+      },
+      {
+        ref: { pt: "Isaías 41:10", en: "Isaiah 41:10", es: "Isaías 41:10" },
+        pt: "Não temas, porque eu sou contigo; não te assombres, porque eu sou o teu Deus; eu te fortaleço, e te ajudo, e te sustento com a destra da minha justiça.",
+        en: "Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness.",
+        es: "No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo; siempre te ayudaré, siempre te sustentaré con la diestra de mi justicia."
+      },
+      {
+        ref: { pt: "Joel 2:26", en: "Joel 2:26", es: "Joel 2:26" },
+        pt: "Comereis abundantemente, e vos fartareis, e louvareis o nome do Senhor vosso Deus, que procedeu para convosco maravilhosamente.",
+        en: "Ye shall eat in plenty, and be satisfied, and praise the name of the Lord your God, that hath dealt wondrously with you.",
+        es: "Comeréis hasta saciaros, y alabaréis el nombre del Señor vuestro Dios, el cual hizo maravillas con vosotros."
+      },
+      {
+        ref: { pt: "Números 6:24-26", en: "Numbers 6:24-26", es: "Números 6:24-26" },
+        pt: "O Senhor te abençoe e te guarde; o Senhor faça resplandecer o seu rosto sobre ti e tenha misericórdia de ti; o Senhor sobre ti levante o seu rosto e te dê a paz.",
+        en: "The Lord bless thee, and keep thee: the Lord make his face shine upon thee, and be gracious unto thee: the Lord lift up his countenance upon thee, and give thee peace.",
+        es: "El Señor te bendiga y te guarde; el Señor haga resplandecer su rostro sobre ti y tenga de ti misericordia; el Señor alce sobre ti su rostro y te dé paz."
+      }
+    ];
+
+    function diaDoAno() {
+      var agora = new Date();
+      var inicio = new Date(agora.getFullYear(), 0, 0);
+      return Math.floor((agora.getTime() - inicio.getTime()) / 86400000);
+    }
+
+    function mostrarVersiculo(codigo) {
+      var item = VERSICULOS[diaDoAno() % VERSICULOS.length];
+      var lingua = item[codigo] ? codigo : "pt";
+      document.getElementById("versiculo-texto").textContent = item[lingua];
+      document.getElementById("versiculo-ref").textContent = item.ref[lingua];
+    }
+
+    function idiomaDaUrl() {
+      var codigo = (lerParametro("idioma") || lerParametro("lang") || "").toLowerCase();
+      if (codigo === "pt" || codigo === "en" || codigo === "es") {
+        return codigo;
+      }
+      return "";
+    }
+
+    function aplicarIdioma(codigo) {
+      var t = TEXTOS[codigo] || TEXTOS.pt;
+      document.documentElement.lang = t.html;
+      document.title = t.tituloPagina;
+      var campos = document.querySelectorAll("[data-i18n]");
+      for (var i = 0; i < campos.length; i++) {
+        var chave = campos[i].getAttribute("data-i18n");
+        if (t[chave]) {
+          campos[i].textContent = t[chave];
+        }
+      }
+      var aviso = document.getElementById("boas-vindas");
+      aviso.textContent = t.boasVindas.replace("{nome}", nomeDaPagina());
+      aviso.className = "boas-vindas visivel";
+      mostrarVersiculo(codigo);
+      var opcoes = document.querySelectorAll(".idiomas button");
+      for (var j = 0; j < opcoes.length; j++) {
+        var ativo = opcoes[j].getAttribute("data-idioma") === codigo;
+        opcoes[j].className = ativo ? "ativo" : "";
+        opcoes[j].setAttribute("aria-pressed", ativo ? "true" : "false");
+      }
+    }
+
+    function gravarIdioma(codigo) {
+      try {
+        localStorage.setItem("celeiro-idioma", codigo);
+      } catch (erro) {}
+      var busca = new URLSearchParams(window.location.search);
+      var nomeChave = "";
+      busca.forEach(function (valor, chave) {
+        if (!nomeChave && !valor && chave !== "idioma" && chave !== "lang" && chave !== "aluno" && chave !== "id") {
+          nomeChave = chave;
+        }
+      });
+      var partes = [];
+      if (lerParametro("aluno")) {
+        partes.push("aluno=" + encodeURIComponent(lerParametro("aluno")));
+      } else if (lerParametro("id")) {
+        partes.push("id=" + encodeURIComponent(lerParametro("id")));
+      } else if (nomeChave) {
+        partes.push(encodeURIComponent(nomeChave));
+      }
+      partes.push("idioma=" + codigo);
+      history.replaceState(null, "", "?" + partes.join("&"));
+      aplicarIdioma(codigo);
+    }
+
+    var botoes = document.querySelectorAll(".download-planilha");
+    for (var i = 0; i < botoes.length; i++) {
+      botoes[i].setAttribute("href", ARQUIVO_PLANILHA);
+    }
+
+    var idiomaInicial = idiomaDaUrl();
+    if (!idiomaInicial) {
+      try {
+        idiomaInicial = localStorage.getItem("celeiro-idioma") || "";
+      } catch (erro) {
+        idiomaInicial = "";
+      }
+    }
+    if (!TEXTOS[idiomaInicial]) {
+      idiomaInicial = "pt";
+    }
+    aplicarIdioma(idiomaInicial);
+
+    var opcoesIdioma = document.querySelectorAll(".idiomas button");
+    for (var k = 0; k < opcoesIdioma.length; k++) {
+      opcoesIdioma[k].addEventListener("click", function () {
+        gravarIdioma(this.getAttribute("data-idioma"));
+      });
+    }
+  </script>
+</body>
+</html>
